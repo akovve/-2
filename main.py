@@ -5,7 +5,7 @@ class PostfixCalculator:
         """Инициализация пустого стека."""
         self.stack = []
 
-    def evaluate(self, expression: str) -> floa:
+    def evaluate(self, expression: str) -> float:
         """
         Вычисляет значение выражения в постфиксной записи.
 
