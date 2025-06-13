@@ -61,25 +61,32 @@ class PostfixCalculator:
             return False
 
 
-def run_tests():
-    """Тестирование калькулятора с несколькими выражениями."""
+def main():
+    """Основная функция с дружественным интерфейсом."""
     calc = PostfixCalculator()
-
-    tests = {
-        "3 5 +": 8.0,
-        "10 4 -": 6.0,
-        "2 3 * 4 +": 10.0,
-        "20 5 /": 4.0,
-        "5 1 2 + 4 * + 3 -": 14.0
-    }
-
-    for expr, expected in tests.items():
-        result = calc.evaluate(expr)
-        assert abs(result - expected) < 0.000001, f"Тест не пройден: {expr}"
-        print(f"{expr} = {result}")
-
-    print("Все тесты пройдены!")
+    print("Добро пожаловать в калькулятор постфиксных выражений!")
+    print("Введите выражение в постфиксной форме (например: '3 5 + 2 *').")
+    print("Для выхода введите 'exit' или 'quit'.")
+    
+    while True:
+        user_input = input("\nВведите выражение: ").strip()
+        
+        if user_input.lower() in ('exit', 'quit'):
+            print("До свидания!")
+            break
+            
+        if not user_input:
+            print("Ошибка: Вы не ввели выражение. Попробуйте снова.")
+            continue
+            
+        try:
+            result = calc.evaluate(user_input)
+            print(f"Результат: {result}")
+        except ValueError as e:
+            print(f"Ошибка: {e}")
+        except Exception as e:
+            print(f"Неожиданная ошибка: {e}")
 
 
 if __name__ == "__main__":
-    run_tests()
+    main()
