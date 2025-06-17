@@ -1,5 +1,4 @@
 class Stack:
-
     def __init__(self):
         """Инициализация пустого стека."""
         self._items = []
@@ -44,7 +43,6 @@ class PostfixCalculator:
         """
         Вычисляет значение постфиксного выражения.
         """
-
         self._stack.clear()
         tokens = expression.strip().split()
 
@@ -70,12 +68,6 @@ class PostfixCalculator:
     def _apply_operator(self, operator):
         """
         Применяет оператор к двум верхним элементам стека.
-
-        Args:
-            operator: Один из операторов: +, -, *, /
-
-        Raises:
-            ValueError: При ошибках в операции или недостатке операндов
         """
         try:
             if self._stack.size() < 2:
@@ -101,16 +93,9 @@ class PostfixCalculator:
         except ValueError as e:
             raise ValueError(f"Ошибка выполнения операции: {e}")
 
-    @staticmethod
-    def _is_number(token):
+    def _is_number(self, token):
         """
         Проверяет, может ли строка быть преобразована в число.
-
-        Args:
-            token: Строка для проверки
-
-        Returns:
-            bool: True если строка может быть числом, иначе False
         """
         try:
             float(token)
@@ -122,9 +107,11 @@ class PostfixCalculator:
 class CalculatorUI:
     """Класс для взаимодействия с пользователем."""
 
-    def friendUI():
+    def __init__(self):
+        self.calculator = PostfixCalculator()
+
+    def run(self):
         """Запускает интерактивный интерфейс калькулятора."""
-        calculator = PostfixCalculator()
         print("//================================================//")
         print("||       КАЛЬКУЛЯТОР ПОСТФИКСНЫХ ВЫРАЖЕНИЙ        ||")
         print("||================================================||")
@@ -145,7 +132,7 @@ class CalculatorUI:
                     print("Ошибка: Пустой ввод. Пожалуйста, введите выражение.")
                     continue
 
-                result = calculator.evaluate(user_input)
+                result = self.calculator.evaluate(user_input)
                 print(f"Результат: {result:.2f}" if result % 1 else f"Результат: {int(result)}")
 
             except ValueError as e:
@@ -155,4 +142,5 @@ class CalculatorUI:
 
 
 if __name__ == "__main__":
-    CalculatorUI.friendUI()
+    ui = CalculatorUI()
+    ui.run()
