@@ -1,93 +1,158 @@
-class PostfixCalculator:
-    """Калькулятор для постфиксных выражений
-    ."""
+class Stack:
 
     def __init__(self):
         """Инициализация пустого стека."""
-        self.stack = []
+        self._items = []
 
-    def evaluate(self, expression: str) -> float:
-        """
-        Вычисляет значение выражения в постфиксной записи.
+    def push(self, item):
+        """Добавляет элемент на вершину стека."""
+        self._items.append(item)
 
-        :param expression: Строка с выражением, разделённым пробелами
-        :return: Результат вычисления
-        :raises ValueError: В случае ошибки синтаксиса или арифметики
+    def pop(self):
+        """Удаляет и возвращает элемент с вершины стека."""
+        if self.is_empty():
+            raise IndexError("Попытка извлечения из пустого стека")
+        return self._items.pop()
+
+    def peek(self):
+        """Возвращает элемент с вершины стека без удаления."""
+        if self.is_empty():
+            raise IndexError("Попытка просмотра вершины пустого стека")
+        return self._items[-1]
+
+    def is_empty(self):
+        """Проверяет, пуст ли стек."""
+        return len(self._items) == 0
+
+    def size(self):
+        """Возвращает количество элементов в стеке."""
+        return len(self._items)
+
+    def clear(self):
+        """Очищает стек."""
+        self._items.clear()
+
+
+class PostfixCalculator:
+    """Калькулятор для вычисления постфиксных выражений."""
+
+    def __init__(self):
+        """Инициализация калькулятора с пустым стеком."""
+        self._stack = Stack()
+
+    def evaluate(self, expression):
         """
-        self.stack.clear()
+        Вычисляет значение постфиксного выражения.
+        """
+
+        self._stack.clear()
         tokens = expression.strip().split()
 
+        if not tokens:
+            raise ValueError("Пустое выражение")
+
         for token in tokens:
-            if self._is_number(token):
-                self.stack.append(float(token))
-            elif token in ('+', '-', '*', '/'):
-                self._apply_operator(token)
+            try:
+                if self._is_number(token):
+                    self._stack.push(float(token))
+                elif token in {'+', '-', '*', '/'}:
+                    self._apply_operator(token)
+                else:
+                    raise ValueError(f"Недопустимый знак: '{token}'")
+            except ValueError as e:
+                raise ValueError(f"Ошибка обработки знака '{token}': {e}")
+
+        if self._stack.size() != 1:
+            raise ValueError("Некорректное выражение: в стеке осталось несколько значений")
+
+        return self._stack.pop()
+
+    def _apply_operator(self, operator):
+        """
+        Применяет оператор к двум верхним элементам стека.
+
+        Args:
+            operator: Один из операторов: +, -, *, /
+
+        Raises:
+            ValueError: При ошибках в операции или недостатке операндов
+        """
+        try:
+            if self._stack.size() < 2:
+                raise ValueError("Недостаточно операндов для операции")
+
+            right_operand = self._stack.pop()
+            left_operand = self._stack.pop()
+
+            if operator == '+':
+                result = left_operand + right_operand
+            elif operator == '-':
+                result = left_operand - right_operand
+            elif operator == '*':
+                result = left_operand * right_operand
+            elif operator == '/':
+                if right_operand == 0:
+                    raise ValueError("Деление на ноль невозможно")
+                result = left_operand / right_operand
             else:
-                raise ValueError(f"Неизвестный символ: '{token}'")
+                raise ValueError(f"Неизвестный оператор: '{operator}'")
 
-        if len(self.stack) != 1:
-            raise ValueError("Некорректное выражение: стек не пуст")
+            self._stack.push(result)
+        except ValueError as e:
+            raise ValueError(f"Ошибка выполнения операции: {e}")
 
-        return self.stack.pop()
+    @staticmethod
+    def _is_number(token):
+        """
+        Проверяет, может ли строка быть преобразована в число.
 
-    def _apply_operator(self, operator: str) -> None:
-        """Выполняет операцию над двумя верхними элементами стека."""
-        if len(self.stack) < 2:
-            raise ValueError("Недостаточно операндов для операции")
+        Args:
+            token: Строка для проверки
 
-        b = self.stack.pop()
-        a = self.stack.pop()
-
-        if operator == '+':
-            result = a + b
-        elif operator == '-':
-            result = a - b
-        elif operator == '*':
-            result = a * b
-        elif operator == '/':
-            if b == 0:
-                raise ValueError("Деление на ноль недопустимо")
-            result = a / b
-        else:
-            raise ValueError(f"Неизвестный оператор: '{operator}'")
-
-        self.stack.append(result)
-
-    def _is_number(self, token: str) -> bool:
-        """Проверка, можно ли привести токен к числу."""
+        Returns:
+            bool: True если строка может быть числом, иначе False
+        """
         try:
             float(token)
             return True
-        except:
+        except ValueError:
             return False
 
 
-def main():
-    """Основная функция с дружественным интерфейсом."""
-    calc = PostfixCalculator()
-    print("Добро пожаловать в калькулятор постфиксных выражений!")
-    print("Введите выражение в постфиксной форме (например: '3 5 + 2 *').")
-    print("Для выхода введите 'exit' или 'quit'.")
-    
-    while True:
-        user_input = input("\nВведите выражение: ").strip()
-        
-        if user_input.lower() in ('exit', 'quit'):
-            print("До свидания!")
-            break
-            
-        if not user_input:
-            print("Ошибка: Вы не ввели выражение. Попробуйте снова.")
-            continue
-            
-        try:
-            result = calc.evaluate(user_input)
-            print(f"Результат: {result}")
-        except ValueError as e:
-            print(f"Ошибка: {e}")
-        except Exception as e:
-            print(f"Неожиданная ошибка: {e}")
+class CalculatorUI:
+    """Класс для взаимодействия с пользователем."""
+
+    def friendUI():
+        """Запускает интерактивный интерфейс калькулятора."""
+        calculator = PostfixCalculator()
+        print("//================================================//")
+        print("||       КАЛЬКУЛЯТОР ПОСТФИКСНЫХ ВЫРАЖЕНИЙ        ||")
+        print("||================================================||")
+        print("|| Пример ввода: 3 5 + 2 *                        ||")
+        print("|| Доступные операции: + - * /                    ||")
+        print("|| Для выхода введите 'exit' или 'quit'           ||")
+        print("//================================================//")
+
+        while True:
+            try:
+                user_input = input("\nВведите выражение: ").strip()
+
+                if user_input.lower() in {'exit', 'quit', 'выйти'}:
+                    print("\nРабота программы завершена. До свидания!")
+                    break
+
+                if not user_input:
+                    print("Ошибка: Пустой ввод. Пожалуйста, введите выражение.")
+                    continue
+
+                result = calculator.evaluate(user_input)
+                print(f"Результат: {result:.2f}" if result % 1 else f"Результат: {int(result)}")
+
+            except ValueError as e:
+                print(f"Ошибка: {e}")
+            except Exception as e:
+                print(f"Неожиданная ошибка: {e}")
 
 
 if __name__ == "__main__":
-    main()
+    CalculatorUI.friendUI()
