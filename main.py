@@ -97,7 +97,7 @@ class PostfixCalculator:
             raise ValueError(f"Ошибка выполнения операции: {e}")
 
     def _is_number(self, token):
-        """Проверяет, является ли токен числом."""
+        """Проверяет, является ли токен числом (включая отрицательные)."""
         try:
             float(token)
             return True
@@ -105,43 +105,37 @@ class PostfixCalculator:
             return False
 
 
-class CalculatorUI:
-    """Класс для взаимодействия с пользователем."""
+def main():
+    """Основная функция для взаимодействия с пользователем."""
+    calculator = PostfixCalculator()
+    
+    print("//====================================================//")
+    print("||         КАЛЬКУЛЯТОР ПОСТФИКСНЫХ ВЫРАЖЕНИЙ          ||")
+    print("||====================================================||")
+    print("|| Пример ввода: 3 5 + 2 *                            ||")
+    print("|| Доступные операции: + - * /                        ||")
+    print("|| Для выхода введите 'exit' или 'quit' или 'выйти'   ||")
+    print("//====================================================//")
 
-    def __init__(self):
-        self.calculator = PostfixCalculator()
+    while True:
+        try:
+            user_input = input("\nВведите выражение: ").strip()
 
-    def run(self):
-        """Запускает интерактивный интерфейс калькулятора."""
-        print("//==================================================//")
-        print("||        КАЛЬКУЛЯТОР ПОСТФИКСНЫХ ВЫРАЖЕНИЙ         ||")
-        print("||==================================================||")
-        print("|| Пример ввода: 3 5 + 2 *                          ||")
-        print("|| Доступные операции: + - * /                      ||")
-        print("|| Для выхода введите 'exit' или 'quit' или 'выйти' ||")
-        print("//==================================================//")
+            if user_input.lower() in {'exit', 'quit', 'выйти'}:
+                print("\nРабота программы завершена. До свидания!")
+                break
 
-        while True:
-            try:
-                user_input = input("\nВведите выражение: ").strip()
+            if not user_input:
+                print("Ошибка: Пустой ввод. Пожалуйста, введите выражение.")
+                continue
 
-                if user_input.lower() in {'exit', 'quit', 'выйти'}:
-                    print("\nРабота программы завершена. До свидания!")
-                    break
+            result = calculator.evaluate(user_input)
+            print(f"Результат: {result:.2f}" if result % 1 else f"Результат: {int(result)}")
 
-                if not user_input:
-                    print("Ошибка: Пустой ввод. Пожалуйста, введите выражение.")
-                    continue
-
-                result = self.calculator.evaluate(user_input)
-                print(f"Результат: {result:.2f}" if result % 1 else f"Результат: {int(result)}")
-
-            except ValueError as e:
-                print(f"Ошибка: {e}")
-            except Exception as e:
-                print(f"Неожиданная ошибка: {e}")
-
+        except ValueError as e:
+            print(f"Ошибка: {e}")
+        except Exception as e:
+            print(f"Неожиданная ошибка: {e}")
 
 if __name__ == "__main__":
-    ui = CalculatorUI()
-    ui.run()
+    main()
