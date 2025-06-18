@@ -36,7 +36,12 @@ class Stack:
         return self.top is None
 
     def clear(self):
-        """Очистка стека"""
+        """Полная очистка стека с освобождением памяти"""
+        current = self.top
+        while current is not None:
+            next_node = current.next 
+            current.next = None       
+            current = next_node       
         self.top = None
         self.size = 0
 
