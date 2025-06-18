@@ -45,7 +45,7 @@ class PostfixCalculator:
         """
         self._stack.clear()
         tokens = expression.strip().split()
-
+            
         if not tokens:
             raise ValueError("Пустое выражение")
 
@@ -62,6 +62,9 @@ class PostfixCalculator:
 
         if self._stack.size() != 1:
             raise ValueError("Некорректное выражение: в стеке осталось несколько значений")
+        
+        if token.lstrip('-').replace('.', '', 1).isdigit():
+            self._stack.push(float(token))
 
         return self._stack.pop()
 
@@ -94,9 +97,7 @@ class PostfixCalculator:
             raise ValueError(f"Ошибка выполнения операции: {e}")
 
     def _is_number(self, token):
-        """
-        Проверяет, может ли строка быть преобразована в число.
-        """
+        """Проверяет, является ли токен числом."""
         try:
             float(token)
             return True
